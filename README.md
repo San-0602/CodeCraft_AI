@@ -33,3 +33,9 @@ Built with Streamlit, powered by Cohere AI for project generation, and integrate
 
 ```bash
 pip install -r requirements.txt
+
+streamlit
+cohere
+fpdf
+razorpay
+
