@@ -1,4 +1,3 @@
-
 # File: app.py
 # Project: CodeCraft AI
 # Author: S. Sandhya (San-0602)
@@ -100,17 +99,84 @@ if 'generated_text' not in st.session_state:
     st.session_state.generated_text = ""
 
 # ---------- Project Generator ---------- #
-if st.button("⚙️ Generate My Project") and topic:
-    st.info("Generating project with AI... please wait")
-    try:
-        prompt = build_prompt(project_type, difficulty, language, topic)
-        response = co.generate(model='command-r-plus', prompt=prompt, max_tokens=1500)
-        gen = response.generations[0].text.strip()
-        st.session_state.generated_text = gen
-        st.session_state.pdf_buffer = create_pdf(gen)
-        st.success("🎉 Done! See the preview below and download if satisfied.")
-    except Exception as e:
-        st.error(f"❌ Error: {str(e)}")
+# After generating the project code (generated variable holds code text)
+
+if st.button("🚀 Generate Project") and topic:
+    with st.spinner("Generating your project..."):
+        try:
+            prompt = build_prompt(project_type, difficulty, language, topic)
+            response = co.generate(
+                model='command-r-plus',
+                prompt=prompt,
+                max_tokens=4000,  # increased token limit as you said
+                temperature=0.8,
+            )
+            generated = response.generations[0].text.strip()
+            st.session_state.generated_code = generated
+            st.session_state.explanation = None  # reset explanation on new generation
+            st.success("✅ Project Generated! Scroll down to see or explain code.")
+        except Exception as e:
+            st.error(f"❌ Error: {str(e)}")
+
+if 'generated_code' in st.session_state:
+    st.markdown("### Generated Project Code:")
+    st.code(st.session_state.generated_code, language=language.lower())
+
+    if st.button("📝 Explain this code"):
+        with st.spinner("Generating explanation..."):
+            try:
+                explain_prompt = (
+                    f"Explain the following {language} project code step by step in simple terms:\n\n"
+                    f"{st.session_state.generated_code}"
+                )
+                explanation_response = co.generate(
+                    model='command-r-plus',
+                    prompt=explain_prompt,
+                    max_tokens=1500,
+                    temperature=0.5,
+                )
+                explanation = explanation_response.generations[0].text.strip()
+                st.session_state.explanation = explanation
+            except Exception as e:
+                st.error(f"❌ Explanation generation failed: {str(e)}")
+
+    if st.session_state.explanation:
+        st.markdown("### Code Explanation:")
+        st.write(st.session_state.explanation)
+
+    # ---------- AI Pair Programmer Section ----------
+    st.markdown("### 🤖 AI Pair Programmer — Ask questions about your project code!")
+
+    user_question = st.text_input("Type your question/request about the generated code:")
+
+    if st.button("Ask AI") and user_question.strip() != "":
+        with st.spinner("Thinking..."):
+            try:
+                pair_prog_prompt = (
+                    f"You are an expert {language} developer helping a user understand and improve their code.\n"
+                    f"The code is:\n{st.session_state.generated_code}\n\n"
+                    f"User question/request: {user_question}\n\n"
+                    f"Answer clearly and helpfully."
+                )
+                pair_response = co.generate(
+                    model='command-r-plus',
+                    prompt=pair_prog_prompt,
+                    max_tokens=1000,
+                    temperature=0.7,
+                )
+                pair_answer = pair_response.generations[0].text.strip()
+                if "pair_prog_history" not in st.session_state:
+                    st.session_state.pair_prog_history = []
+                st.session_state.pair_prog_history.append((user_question, pair_answer))
+            except Exception as e:
+                st.error(f"❌ AI Pair Programmer failed: {str(e)}")
+
+    # Show previous Q&A in reverse order (latest first)
+    if 'pair_prog_history' in st.session_state:
+        for q, a in reversed(st.session_state.pair_prog_history):
+            st.markdown(f"**Q:** {q}")
+            st.markdown(f"**A:** {a}")
+            st.markdown("---")
 
 # ---------- Code Preview ---------- #
 if st.session_state.generated_text:
@@ -126,10 +192,10 @@ if st.session_state.pdf_buffer:
         mime="application/pdf"
     )
     st.markdown(f"""
-    <a class='share-btn' href='https://twitter.com/intent/tweet?text=Just+generated+my+project+using+%23CodeCraftAI+%F0%9F%9A%80!+Try+it+out+now!'>
+    <a class='share-btn' href='https://twitter.com/intent/tweet?text=Just+generated+my+project+using+%23CodeCraftAI+%F0%9F%9A%80!+Try+it+out+now!' target="_blank">
         📣 Share on Twitter/X
     </a>
-    <a class='share-btn' href='https://www.linkedin.com/sharing/share-offsite/?url=https://codecraft-ai'>
+    <a class='share-btn' href='https://www.linkedin.com/sharing/share-offsite/?url=https://codecraft-ai' target="_blank">
         👔 Share on LinkedIn
     </a>
     """, unsafe_allow_html=True)
