@@ -26,7 +26,7 @@ Built with Streamlit, powered by Cohere AI for project generation, and integrate
 
 ## Getting Started
 
-##⚠️ License & Usage
+⚠️ License & Usage
 This project is licensed under All Rights Reserved.
 
 You are not permitted to use, copy, modify, distribute, or publish any part of this codebase without the author's explicit written permission. For collaboration requests, please contact me.
