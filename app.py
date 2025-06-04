@@ -1,7 +1,7 @@
 # File: app.py
 # Project: CodeCraft AI
 # Author: S. Sandhya (San-0602)
-# Completed: 03-06-2025
+# Completed on: 03-06-2025
 
 import streamlit as st
 import cohere
@@ -15,7 +15,7 @@ from datetime import datetime
 co = cohere.Client(st.secrets["COHERE_API_KEY"])
 st.set_page_config(page_title="CodeCraft AI", layout="wide")
 
-# ---------- Custom CSS ---------- #
+#CSS 
 st.markdown(
     """
     <style>
@@ -57,7 +57,7 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# ---------- Header ---------- #
+#Header
 st.title("🚀 CodeCraft AI")
 st.caption("From Prompt to Project — Built for Final Year Warriors 💪")
 
@@ -66,8 +66,8 @@ st.markdown("""
     ✨ Instantly generate code, report, and viva questions for your dream project. Just type your idea and hit GO!
 </div>
 """, unsafe_allow_html=True)
+#UI
 
-# ---------- Input Controls ---------- #
 col1, col2, col3 = st.columns(3)
 with col1:
     project_type = st.selectbox("Choose Project Type:", ["Web App", "Android App", "ML", "CLI Tool", "Other"])
@@ -78,11 +78,10 @@ with col3:
 
 topic = st.text_input("💡 Describe your project idea:")
 
-# ---------- Prompt Builder ---------- #
+
 def build_prompt(ptype, diff, lang, top):
     return f"Generate a {diff.lower()} {ptype.lower()} project in {lang}. Topic: {top}. Include code, project report, and viva questions."
 
-# ---------- PDF Generator ---------- #
 def create_pdf(content):
     pdf = FPDF()
     pdf.add_page()
@@ -92,7 +91,6 @@ def create_pdf(content):
     buf = io.BytesIO(pdf.output(dest='S').encode('latin-1'))
     return buf
 
-# ---------- Session State ---------- #
 if 'pdf_buffer' not in st.session_state:
     st.session_state.pdf_buffer = None
 if 'generated_text' not in st.session_state:
@@ -107,12 +105,12 @@ if st.button("🚀 Generate Project") and topic:
             response = co.generate(
                 model='command-r-plus',
                 prompt=prompt,
-                max_tokens=4000,  
+                max_tokens=4000, 
                 temperature=0.8,
             )
             generated = response.generations[0].text.strip()
             st.session_state.generated_code = generated
-            st.session_state.explanation = None  
+            st.session_state.explanation = None 
             st.success("✅ Project Generated! Scroll down to see or explain code.")
         except Exception as e:
             st.error(f"❌ Error: {str(e)}")
@@ -143,7 +141,7 @@ if 'generated_code' in st.session_state:
         st.markdown("### Code Explanation:")
         st.write(st.session_state.explanation)
 
-    # ---------- AI Pair Programmer Section ----------
+    #AI Pair Programmer
     st.markdown("### 🤖 AI Pair Programmer — Ask questions about your project code!")
 
     user_question = st.text_input("Type your question/request about the generated code:")
@@ -170,7 +168,7 @@ if 'generated_code' in st.session_state:
             except Exception as e:
                 st.error(f"❌ AI Pair Programmer failed: {str(e)}")
 
-    # Show previous Q&A in reverse order 
+    # Show Q&A 
     if 'pair_prog_history' in st.session_state:
         for q, a in reversed(st.session_state.pair_prog_history):
             st.markdown(f"**Q:** {q}")
@@ -199,6 +197,6 @@ if st.session_state.pdf_buffer:
     </a>
     """, unsafe_allow_html=True)
 
-# ---------- Footer ---------- #
+#Footer
 st.markdown("---")
 st.markdown("Made with ❤️ by San-0602 | Connect on [GitHub](https://github.com/San-0602)")
