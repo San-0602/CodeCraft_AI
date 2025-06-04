@@ -1,7 +1,7 @@
 # File: app.py
 # Project: CodeCraft AI
 # Author: S. Sandhya (San-0602)
-# Created: 03-06-2025
+# Completed: 03-06-2025
 
 import streamlit as st
 import cohere
@@ -170,7 +170,7 @@ if 'generated_code' in st.session_state:
             except Exception as e:
                 st.error(f"❌ AI Pair Programmer failed: {str(e)}")
 
-    # Show previous Q&A in reverse order (latest first)
+    # Show previous Q&A in reverse order 
     if 'pair_prog_history' in st.session_state:
         for q, a in reversed(st.session_state.pair_prog_history):
             st.markdown(f"**Q:** {q}")
