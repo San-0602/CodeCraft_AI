@@ -99,7 +99,6 @@ if 'generated_text' not in st.session_state:
     st.session_state.generated_text = ""
 
 # ---------- Project Generator ---------- #
-# After generating the project code (generated variable holds code text)
 
 if st.button("🚀 Generate Project") and topic:
     with st.spinner("Generating your project..."):
@@ -108,12 +107,12 @@ if st.button("🚀 Generate Project") and topic:
             response = co.generate(
                 model='command-r-plus',
                 prompt=prompt,
-                max_tokens=4000,  # increased token limit as you said
+                max_tokens=4000,  
                 temperature=0.8,
             )
             generated = response.generations[0].text.strip()
             st.session_state.generated_code = generated
-            st.session_state.explanation = None  # reset explanation on new generation
+            st.session_state.explanation = None  
             st.success("✅ Project Generated! Scroll down to see or explain code.")
         except Exception as e:
             st.error(f"❌ Error: {str(e)}")
