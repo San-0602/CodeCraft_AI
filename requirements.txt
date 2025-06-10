@@ -3,3 +3,4 @@ cohere
 Flask
 gunicorn
 fpdf
+bootstrap
