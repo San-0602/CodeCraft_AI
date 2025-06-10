@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>CodeCraft AI</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      --bg: #0b0c10;
+      --text: #fefefe;
+      --highlight: #ffd700;
+      --card: #1f1f1f;
+      --input-bg: #2a2a2a;
+      --code-bg: #000;
+      --code-text: #00f0ff;
+    }
+
+    body.owl-theme {
+      --bg: #000;
+      --text: #fff;
+      --highlight: #ccc;
+      --card: #222;
+      --input-bg: #333;
+      --code-bg: #111;
+      --code-text: #ccc;
+    }
+
+    body.ironman-theme {
+      --bg: #0b0c10;
+      --text: #fefefe;
+      --highlight: #ffd700;
+      --card: #1f1f1f;
+      --input-bg: #2a2a2a;
+      --code-bg: #000;
+      --code-text: #00f0ff;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    .fact-bar {
+      text-align: center;
+      background: var(--card);
+      padding: 10px 20px;
+      color: var(--highlight);
+      font-size: 0.95em;
+      font-style: italic;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    }
+
+    header {
+      background: linear-gradient(to right, #b30000, #ffd700);
+      padding: 30px;
+      text-align: center;
+      color: var(--text);
+      font-weight: 900;
+      font-size: 1.8em;
+      text-shadow: 2px 2px 10px #000000aa;
+    }
+
+    main {
+      max-width: 1000px;
+      margin: 30px auto;
+      padding: 30px;
+      background-color: var(--card);
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(255, 215, 0, 0.2);
+    }
+
+    label, h2, h3 {
+      color: var(--highlight);
+    }
+
+    input, select, textarea, button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      border: none;
+      font-weight: bold;
+      background-color: var(--input-bg);
+      color: var(--text);
+    }
+
+    button {
+      background-color: #b30000;
+      color: #fff;
+      box-shadow: 0 4px 10px rgba(255, 215, 0, 0.5);
+      cursor: pointer;
+      transition: all 0.3s ease-in-out;
+      font-size: 1em;
+    }
+
+    button:hover {
+      background-color: var(--highlight);
+      color: #000;
+      transform: scale(1.03);
+    }
+
+    .share-btn {
+      background: var(--highlight);
+      color: #000;
+      border-radius: 8px;
+      padding: 10px;
+      font-weight: bold;
+      text-align: center;
+      display: inline-block;
+      margin-right: 10px;
+      text-decoration: none;
+      box-shadow: 0 2px 8px rgba(255, 215, 0, 0.5);
+    }
+
+    .share-btn:hover {
+      background: #b30000;
+      color: #fff;
+    }
+
+    pre {
+      background-color: var(--code-bg);
+      padding: 15px;
+      border-radius: 10px;
+      overflow-x: auto;
+      color: var(--code-text);
+      border: 1px solid var(--highlight);
+      font-family: 'Courier New', monospace;
+      white-space: pre-wrap;
+    }
+
+    .qa-section {
+      margin-top: 30px;
+      border-top: 1px solid #444;
+      padding-top: 20px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 20px;
+      color: #999;
+      font-size: 0.95em;
+      background: transparent;
+      margin-top: 40px;
+    }
+
+    footer a {
+      color: var(--highlight);
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    footer a:hover {
+      text-shadow: 0 0 5px var(--highlight);
+    }
+
+    .spinner {
+      margin: auto;
+      width: 40px;
+      height: 40px;
+      border: 5px solid #ccc;
+      border-top: 5px solid #f00;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .toggle-theme {
+      position: fixed;
+      top: 12px;
+      right: 12px;
+      background: var(--highlight);
+      color: #000;
+      border: none;
+      padding: 6px;
+      border-radius: 50%;
+      font-weight: bold;
+      cursor: pointer;
+      z-index: 9999;
+      font-size: 14px;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+    }
+    body.owl-theme header {
+  background: linear-gradient(to right, #000000, #444444);
+}
+  </style>
+</head>
+
+<body class="ironman-theme">
+
+  <!-- Theme Toggle Button -->
+  <button class="toggle-theme" onclick="toggleTheme()">🌓</button>
+
+  <!-- Quote Bar -->
+  <div class="fact-bar">💡 Fact: The first computer virus was a Creeper.</div>
+  <header>
+    <h1>🚀 CodeCraft AI</h1>
+    <p>From Prompt to Project — Built for Final Year Warriors 💪</p>
+  </header>
+
+  <main>
+    <form method="POST">
+      <label>Choose Project Type:</label>
+      <select name="project_type">
+        <option>Web App</option>
+        <option>Android App</option>
+        <option>ML</option>
+        <option>CLI Tool</option>
+        <option>Other</option>
+      </select>
+
+      <label>Difficulty Level:</label>
+      <select name="difficulty">
+        <option>Beginner</option>
+        <option>Intermediate</option>
+        <option>Advanced</option>
+      </select>
+
+      <label>Programming Language:</label>
+      <select name="language">
+        <option>Python</option>
+        <option>Java</option>
+        <option>Kotlin</option>
+        <option>JavaScript</option>
+        <option>C++</option>
+        <option>Other</option>
+      </select>
+
+      <label>💡 Describe your project idea:</label>
+      <input type="text" name="topic" required>
+
+      <button type="submit" name="action" value="generate">🚀 Generate Project</button>
+    </form>
+
+    {% if code %}
+    <h2>Generated Project Code:</h2>
+    <pre>{{ code }}</pre>
+
+    <form method="POST">
+      <input type="hidden" name="action" value="explain">
+      <button type="submit">📝 Explain this code</button>
+    </form>
+
+    <div class="qa-section">
+      <h3>🤖 AI Pair Programmer — Ask questions about your project code!</h3>
+      <form method="POST">
+        <input type="hidden" name="action" value="ask">
+        <input type="text" name="user_question" placeholder="Ask about the code..." required>
+        <button type="submit">Ask AI</button>
+      </form>
+      {% for q, a in history %}
+        <p><strong>Q:</strong> {{ q }}</p>
+        <p><strong>A:</strong> {{ a }}</p>
+        <hr>
+      {% endfor %}
+    </div>
+
+    <a href="{{ url_for('download') }}" class="share-btn">💾 Download Project PDF</a>
+    {% endif %}
+
+    {% if explanation %}
+    <h3>Code Explanation:</h3>
+    <pre>{{ explanation | safe }}</pre>
+    {% endif %}
+
+    <br><br>
+    <a class="share-btn" href="https://twitter.com/intent/tweet?text=Just+generated+my+project+using+%23CodeCraftAI+%F0%9F%9A%80!+Try+it+out+now!" target="_blank">📣 Share on Twitter/X</a>
+    <a class="share-btn" href="https://www.linkedin.com/sharing/share-offsite/?url=https://codecraft-ai" target="_blank">👔 Share on LinkedIn</a>
+
+    <!-- Loading Spinner -->
+    <div id="loading" style="display:none; text-align:center; font-weight:bold; color:#ff0000; margin-top:20px;">
+      <p>🛠️ Generating Project... Please wait ⏳</p>
+      <div class="spinner"></div>
+    </div>
+  </main>
+
+  <footer>
+    Made with ❤️ by San-0602 |
+    <a href="https://github.com/San-0602" target="_blank">GitHub</a>
+  </footer>
+
+  <!-- Theme Script -->
+  <script>
+    function toggleTheme() {
+      const body = document.body;
+      if (body.classList.contains("ironman-theme")) {
+        body.classList.remove("ironman-theme");
+        body.classList.add("owl-theme");
+      } else {
+        body.classList.remove("owl-theme");
+        body.classList.add("ironman-theme");
+      }
+    }
+
+    document.querySelectorAll("form").forEach(form => {
+      form.addEventListener("submit", () => {
+        document.getElementById("loading").style.display = "block";
+      });
+    });
+  </script>
+</body>
+</html>
