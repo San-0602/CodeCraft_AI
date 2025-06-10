@@ -10,7 +10,7 @@ import os
 
 app = Flask(__name__)
 
-co = cohere.Client("yHD8B8Zl1AKzAZtLzsdtVjV9PUzNCTaj4iVmdMB7")
+co = cohere.Client(API_KEY)
 
 generated_code = ""
 explanation = ""
