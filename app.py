@@ -1,25 +1,46 @@
 # File: app.py
-# Project: CodeCraft AI 
+# Project: CodeCraft AI
 # Author: S. Sandhya (San-0602)
 
-from flask import Flask, render_template, request, send_file, redirect, url_for
+from pymongo import MongoClient
+from datetime import datetime
+from flask import Flask, render_template, request, send_file, redirect, url_for, session, flash
+from flask_bcrypt import Bcrypt
 import cohere
 from fpdf import FPDF
 import io
+from dotenv import load_dotenv
 import os
 
-app = Flask(__name__)
+# environment variables
+load_dotenv()
 
-co = cohere.Client("yHD8B8Zl1AKzAZtLzsdtVjV9PUzNCTaj4iVmdMB7")
+# Flask setup
+app = Flask(__name__)
+app.secret_key = os.getenv("SECRET_KEY")
+
+# Bcrypt
+bcrypt = Bcrypt(app)
+
+# MongoDB setup
+client = MongoClient(os.getenv("MONGO_URI"))
+db = client.codecraft
+prompts_collection = db.prompts
+users_collection = db.users
+
+# Cohere setup
+co = cohere.Client(os.getenv("COHERE_API_KEY"))
 
 generated_code = ""
 explanation = ""
 pair_prog_history = []
 pdf_buffer = None
 
+# Prompts
 def build_prompt(ptype, diff, lang, top):
     return f"Generate a {diff.lower()} {ptype.lower()} project in {lang}. Topic: {top}. Include code, project report, and viva questions."
 
+# PDF creation
 def create_pdf(content):
     pdf = FPDF()
     pdf.add_page()
@@ -29,8 +50,13 @@ def create_pdf(content):
     buf = io.BytesIO(pdf.output(dest='S').encode('latin-1'))
     return buf
 
-@app.route("/", methods=["GET", "POST"])
-@app.route("/", methods=["GET", "POST"])
+# Splash route
+@app.route("/splash")
+def splash():
+    return render_template("splash.html")
+
+# Home/index
+@app.route("/home", methods=["GET", "POST"])
 def index():
     global generated_code, explanation, pair_prog_history, pdf_buffer
 
@@ -49,8 +75,21 @@ def index():
         action = request.form.get("action")
         user_question = request.form.get("user_question")
 
+        prompts_collection.insert_one({
+            "project_type": form_data["project_type"],
+            "difficulty": form_data["difficulty"],
+            "language": form_data["language"],
+            "topic": form_data["topic"],
+            "timestamp": datetime.now()
+        })
+
         if action == "generate":
-            prompt = build_prompt(form_data["project_type"], form_data["difficulty"], form_data["language"], form_data["topic"])
+            prompt = build_prompt(
+                form_data["project_type"],
+                form_data["difficulty"],
+                form_data["language"],
+                form_data["topic"]
+            )
             response = co.generate(
                 model='command-r-plus',
                 prompt=prompt,
@@ -88,14 +127,94 @@ def index():
             answer = pair_response.generations[0].text.strip()
             pair_prog_history.append((user_question, answer))
 
-    return render_template(
-        "index.html",
+    return render_template("index.html",
         code=generated_code,
         explanation=explanation,
         history=pair_prog_history,
-        form_data=form_data  # ✅ Always send this
+        form_data=form_data
     )
 
+@app.route("/")
+def redirect_to_splash():
+    return redirect(url_for("splash"))
+
+# Admin Login
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        username = request.form.get("username")
+        password = request.form.get("password")
+
+        if username == "admin" and password == "admin123":
+            session["logged_in"] = True
+            return redirect(url_for("admin_dashboard"))
+        else:
+            flash("Invalid admin credentials.")
+    return render_template("login.html")
+
+@app.route("/logout")
+def logout():
+    session.pop("logged_in", None)
+    return redirect(url_for("login"))
+
+@app.route("/admin")
+def admin_dashboard():
+    if not session.get("logged_in"):
+        return redirect(url_for("login"))
+    prompts = list(prompts_collection.find().sort("timestamp", -1))
+    return render_template("admin.html", prompts=prompts)
+
+# User Registration
+@app.route("/user-register", methods=["GET", "POST"])
+def user_register():
+    if request.method == "POST":
+        username = request.form.get("username")
+        password = request.form.get("password")
+        existing_user = db.users.find_one({"username": username})
+
+        if existing_user:
+            flash("Username already exists.")
+        else:
+            hashed_password = bcrypt.generate_password_hash(password).decode("utf-8")
+            db.users.insert_one({
+                "username": username,
+                "password": hashed_password,
+                "joined_on": datetime.now()
+            })
+            flash("Registration successful! Please log in.")
+            return redirect(url_for("user_login"))
+
+    return render_template("user_register.html")
+
+# User Login
+@app.route("/user-login", methods=["GET", "POST"])
+def user_login():
+    if request.method == "POST":
+        username = request.form.get("username")
+        password = request.form.get("password")
+
+        user = db.users.find_one({"username": username})
+        if user and bcrypt.check_password_hash(user["password"], password):
+            session["user_logged_in"] = True
+            session["user_name"] = username
+            flash("Welcome back, " + username + "!")
+            return redirect(url_for("index"))
+        else:
+            flash("Invalid credentials.")
+    return render_template("user_login.html")
+
+    code_positions = [{"top": (i * 15) % 100, "left": (i * 17) % 100} for i in range(50)]
+
+    return render_template("user_login.html", code_positions=code_positions)
+
+@app.route("/user-logout")
+def user_logout():
+    session.pop("user_logged_in", None)
+    session.pop("user_name", None)
+    flash("You’ve been logged out.")
+    return redirect(url_for("index"))
+
+# PDF Download
 @app.route("/download")
 def download():
     global pdf_buffer
@@ -104,5 +223,6 @@ def download():
         return send_file(pdf_buffer, as_attachment=True, download_name="CodeCraft_Project.pdf")
     return redirect(url_for("index"))
 
+# Run the app
 if __name__ == "__main__":
     app.run(debug=True)
