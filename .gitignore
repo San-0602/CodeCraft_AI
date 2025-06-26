@@ -1,3 +1,0 @@
-SECRET_KEY=sandhi0206
-MONGO_URI=mongodb+srv://sandhi0206:Z6sl4dOpWA4DaPk1@cluster0.lz4xwae.mongodb.net/?retryWrites=true&w=majority&tlsAllowInvalidCertificates=true
-COHERE_API_KEY=yHD8B8Zl1AKzAZtLzsdtVjV9PUzNCTaj4iVmdMB7
