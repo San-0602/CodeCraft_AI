@@ -4,340 +4,351 @@
   <meta charset="UTF-8" />
   <title>CodeCraft AI</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg: #0b0c10;
-      --text: #fefefe;
-      --highlight: #ffd700;
-      --card: #1f1f1f;
-      --input-bg: #2a2a2a;
-      --code-bg: #000;
-      --code-text: #00f0ff;
-    }
-     * {
-    transition: background-color 0.4s ease, color 0.4s ease;
-  }
-    body.owl-theme {
-      --bg: #000;
-      --text: #fff;
-      --highlight: #ccc;
-      --card: #222;
-      --input-bg: #333;
-      --code-bg: #111;
-      --code-text: #ccc;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
-      background-color: var(--bg);
-      color: var(--text);
-      font-family: 'Segoe UI', sans-serif;
-      margin: 0;
-      padding: 0;
+      font-family: 'Share Tech Mono', monospace;
+      background: #0d0d0d;
+      color: #00ffe7;
+      overflow-y: auto;
+      position: relative;
+      min-height: 100vh;
     }
 
-    header {
-      background: linear-gradient(to right, #b30000, #ffd700);
-      padding: 30px;
-      text-align: center;
-      color: var(--text);
-      font-weight: 900;
-      font-size: 1.8em;
-      text-shadow: 2px 2px 10px #000000aa;
+    #progress-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #f5af19, #ff002b);
+      z-index: 9999;
+      display: none;
+      transition: width 0.3s ease-in-out;
+    }
+
+    canvas#bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: -1;
+      width: 100%;
+      height: 100%;
+    }
+
+    .ai-buddy-chat {
+      position: fixed;
+      bottom: 90px;
+      right: 20px;
+      background: #111;
+      color: #00ffe7;
+      border: 1px solid #1ecbe1;
+      border-radius: 12px;
+      width: 300px;
+      max-height: 400px;
+      overflow-y: auto;
+      box-shadow: 0 0 20px #1ecbe1;
+      z-index: 10000;
+      display: none;
+      flex-direction: column;
+    }
+
+    .ai-buddy-header {
+      background: linear-gradient(90deg, #f5af19, #ff002b);
+      padding: 12px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .ai-buddy-body {
+      padding: 10px;
+      font-size: 0.9rem;
+    }
+
+    .ai-buddy-toggle {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #00ffe7;
+      border: none;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      font-size: 24px;
+      cursor: pointer;
+      z-index: 10001;
+      box-shadow: 0 0 10px #00ffe7;
+    }
+
+    .center-container {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: center;
+      padding: 40px 20px;
+      min-height: 100vh;
     }
 
     .logo-title {
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 15px;
-}
+      gap: 16px;
+      margin-bottom: 10px;
+    }
+
     .logo-title img {
-      height: 80px;
-      width: 80px;
+      height: 60px;
+      width: 60px;
       border-radius: 50%;
-      object-fit: cover;
-      box-shadow: 0 0 10px rgba(0,0,0,0.5);
-      transition: transform 0.3s;
+      object-fit: contain;
+      filter: drop-shadow(0 0 10px #f5af19) drop-shadow(0 0 20px #ff002b);
     }
 
-    .logo-title img:hover {
-      transform: scale(1.1);
+    .typing-title {
+      font-size: 2.4rem;
+      color: #00f7ff;
+      text-shadow: 0 0 10px #00f7ff;
+      white-space: nowrap;
+      overflow: hidden;
+      border-right: 3px solid #00f7ff;
+      width: 0;
+      animation: typing 2.5s steps(13, end) forwards, blink 0.8s step-end infinite;
     }
 
-    .fact-bar {
+    @keyframes typing {
+      from { width: 0; }
+      to { width: 13ch; } 
+    }
+
+    @keyframes blink {
+      50% { border-color: transparent; }
+    }
+
+    .tagline {
+      font-size: 1.2rem;
+      margin: 8px 0 30px;
+      background: linear-gradient(to right, #f5af19, #ff002b);
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-weight: 600;
       text-align: center;
-      background: var(--card);
-      padding: 10px 20px;
-      color: var(--highlight);
-      font-size: 0.95em;
-      font-style: italic;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.5);
     }
 
-    main {
-      max-width: 1000px;
-      margin: 30px auto;
+    .form-container, .output-container {
+      width: 100%;
+      max-width: 900px;
+      margin: 20px 0;
       padding: 30px;
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 16px;
-      box-shadow: 0 0 25px rgba(255, 215, 0, 0.15);
-      backdrop-filter: blur(10px);
-      animation: fadeIn 1s ease;
+      border-radius: 12px;
+      border: 1px solid #1ecbe1;
+      background: rgba(0, 0, 0, 0.7);
+      box-shadow: 0 0 20px #1ecbe1;
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
+    label {
+      display: block;
+      margin: 10px 0 5px;
+      font-weight: bold;
     }
 
-    label, h2, h3 {
-      color: var(--highlight);
-    }
-
-    input, select, textarea, button {
+    select, input[type="text"] {
       width: 100%;
       padding: 12px;
-      margin-top: 10px;
-      margin-bottom: 20px;
+      margin-bottom: 10px;
       border-radius: 8px;
-      border: none;
-      font-weight: bold;
-      background-color: var(--input-bg);
-      color: var(--text);
+      background: #111;
+      color: #00f7ff;
+      border: 1px solid rgba(30, 203, 225, 0.3);
     }
 
     button {
-      background-color: #b30000;
-      color: #fff;
-      box-shadow: 0 4px 10px rgba(255, 215, 0, 0.5);
-      cursor: pointer;
-      transition: all 0.3s ease-in-out;
-      font-size: 1em;
-    }
-
-    button:hover {
-      background-color: var(--highlight);
-      color: #000;
-      transform: scale(1.03);
-    }
-
-    .share-btn {
-      background: var(--highlight);
-      color: #000;
-      border-radius: 8px;
-      padding: 10px;
-      font-weight: bold;
-      text-align: center;
-      display: inline-block;
-      margin-right: 10px;
-      text-decoration: none;
-      box-shadow: 0 2px 8px rgba(255, 215, 0, 0.5);
-    }
-
-    .share-btn:hover {
-      background: #b30000;
-      color: #fff;
-    }
-
-    pre {
-      background-color: var(--code-bg);
-      padding: 15px;
-      border-radius: 10px;
-      overflow-x: auto;
-      color: var(--code-text);
-      border: 1px solid var(--highlight);
-      font-family: 'Courier New', monospace;
-      white-space: pre-wrap;
-    }
-
-    .qa-section {
-      margin-top: 30px;
-      border-top: 1px solid #444;
-      padding-top: 20px;
-    }
-
-    footer {
-      text-align: center;
-      padding: 20px;
-      color: #999;
-      font-size: 0.95em;
-      margin-top: 40px;
-    }
-
-    footer a {
-      color: var(--highlight);
-      text-decoration: none;
-      font-weight: bold;
-    }
-
-    footer a:hover {
-      text-shadow: 0 0 5px var(--highlight);
-    }
-
-    .spinner {
-      margin: auto;
-      width: 40px;
-      height: 40px;
-      border: 5px solid #ccc;
-      border-top: 5px solid #f00;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    .toggle-theme {
-      position: fixed;
-      top: 12px;
-      right: 12px;
-      background: var(--highlight);
-      color: #000;
+      width: 100%;
+      padding: 12px;
       border: none;
-      padding: 6px;
-      border-radius: 50%;
+      background: linear-gradient(135deg, #f5af19, #ff002b);
+      color: #fff;
+      border-radius: 8px;
       font-weight: bold;
       cursor: pointer;
-      z-index: 9999;
-      font-size: 14px;
-      width: 36px;
-      height: 36px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.25);
     }
-      body.owl-theme header {
-      background: linear-gradient(to right, #000000, #444444);
+
+    button, .download-btn {
+  transition: all 0.3s ease;
+}
+
+button:hover, .download-btn:hover {
+  background: linear-gradient(135deg, #ff002b, #f5af19);
+  box-shadow: 0 0 15px #ff002b, 0 0 30px #f5af19;
+  transform: scale(1.05);
+  color: #fff;
+}
+    .download-btn {
+      display: inline-block;
+      margin-top: 16px;
+      padding: 10px 20px;
+      background: #1ecbe1;
+      color: black;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .output-container pre {
+      background-color: #0d0d0d;
+      color: #00ffcc;
+      padding: 18px;
+      border-radius: 8px;
+      overflow-x: auto;
+      border: 1px solid rgba(0, 255, 231, 0.2);
     }
   </style>
 </head>
-<body class="ironman-theme">
-
-  <button class="toggle-theme" onclick="toggleTheme()">🌓</button>
-
-  <div class="fact-bar">💡 Fact: The first computer virus was a Creeper.</div>
-  <div id="progress-bar" style="width: 0; height: 5px; background: gold;"></div>
-<header>
+<body>
+<div id="progress-bar"></div>
+<canvas id="bg"></canvas>
+<div class="center-container">
   <div class="logo-title">
-    <img src="{{ url_for('static', filename='images/cc.png') }}"
-         alt="CodeCraft AI Logo"
-         style="height: 60px; width: 60px; border-radius: 50%; object-fit: cover;" />
-    <h1 style="margin: 0; font-size: 2em;">CodeCraft AI</h1>
+    <img src="{{ url_for('static', filename='images/cc.png') }}" alt="Logo" />
+    <h1 class="typing-title">CODECRAFT AI</h1>
   </div>
-  <p style="margin-top: 10px;">From Prompt to Project — Built for Final Year Warriors 💪</p>
-</header>
-  <main>
-    <form method="POST">
-      <label>Choose Project Type:</label>
-      <select name="project_type">
-        <option>Web App</option>
-        <option>Android App</option>
-        <option>ML</option>
-        <option>CLI Tool</option>
-        <option>Other</option>
-      </select>
+  <div class="tagline">From Prompt to Project — Built for Final Year Warriors</div>
 
-      <label>Difficulty Level:</label>
-      <select name="difficulty">
-        <option>Beginner</option>
-        <option>Intermediate</option>
-        <option>Advanced</option>
-      </select>
+  <form class="form-container" method="POST">
+    <label for="project_type">Choose Project Type:</label>
+    <select name="project_type" id="project_type">
+      <option>Web App</option>
+      <option>Android App</option>
+      <option>ML</option>
+      <option>CLI Tool</option>
+    </select>
 
-      <label>Programming Language:</label>
-      <select name="language">
-        <option>Python</option>
-        <option>Java</option>
-        <option>Kotlin</option>
-        <option>JavaScript</option>
-        <option>C++</option>
-        <option>Other</option>
-      </select>
+    <label for="difficulty">Difficulty Level:</label>
+    <select name="difficulty" id="difficulty">
+      <option>Beginner</option>
+      <option>Intermediate</option>
+      <option>Advanced</option>
+    </select>
 
-      <label>💡 Describe your project idea:</label>
-      <input type="text" name="topic" required>
+    <label for="language">Programming Language:</label>
+    <select name="language" id="language">
+      <option>Python</option>
+      <option>JavaScript</option>
+      <option>Java</option>
+      <option>C++</option>
+    </select>
 
-      <button type="submit" name="action" value="generate">🚀 Generate Project</button>
-    </form>
+    <label for="topic">Describe your project idea:</label>
+    <input type="text" name="topic" id="topic" required />
 
-    {% if code %}
-    <h2>Generated Project Code:</h2>
+    <button type="submit" name="action" value="generate">⚡ Generate Project</button>
+  </form>
+
+   {% if code %}
+  <div class="output-container">
+    <h2>Generated Code:</h2>
     <pre>{{ code }}</pre>
 
     <form method="POST">
       <input type="hidden" name="action" value="explain">
-      <button type="submit">📝 Explain this code...</button>
+      <button type="submit">🧠 Explain Code</button>
     </form>
 
-    <h3>🤖 AI Pair Programmer — Ask questions about your project code!</h3>
-    <div class="qa-section">
-      <form method="POST">
-        <input type="hidden" name="action" value="ask">
-        <input type="text" name="user_question" placeholder="Ask about the code..." required>
-        <button type="submit">Ask AI</button>
-      </form>
+    {% if explanation %}
+    <h2>Explanation:</h2>
+    <pre>{{ explanation }}</pre>
+    {% endif %}
+
+    <form method="POST" style="margin-top: 20px;">
+      <input type="hidden" name="action" value="ask">
+      <label for="user_question">🤖 Ask CodeCraft Buddy:</label>
+      <input type="text" name="user_question" id="user_question" placeholder="Ask about the code..." required />
+      <button type="submit">Send</button>
+    </form>
+
+    {% if history %}
+    <div style="margin-top: 30px;">
+      <h3>🗣️ Conversation with CodeCraft Buddy</h3>
       {% for q, a in history %}
-        <p><strong>Q:</strong> {{ q }}</p>
-        <p><strong>A:</strong> {{ a }}</p>
-        <hr>
+        <p><strong>You:</strong> {{ q }}</p>
+        <pre>{{ a | safe }}</pre>
       {% endfor %}
     </div>
-
-    <a href="{{ url_for('download') }}" class="share-btn">💾 Download Project PDF</a>
     {% endif %}
 
-    {% if explanation %}
-    <h3>Code Explanation:</h3>
-    <pre>{{ explanation | safe }}</pre>
-    {% endif %}
+    <a class="download-btn" href="{{ url_for('download') }}">📥 Download Project PDF</a>
+  </div>
+  {% endif %}
+</div>
 
-    <br><br>
-    <a class="share-btn" href="https://twitter.com/intent/tweet?text=Just+generated+my+project+using+%23CodeCraftAI+%F0%9F%9A%80!+Try+it+out+now!" target="_blank">📣 Share on Twitter/X</a>
-    <a class="share-btn" href="https://www.linkedin.com/sharing/share-offsite/?url=https://codecraft-ai" target="_blank">👔 Share on LinkedIn</a>
-
-    <div id="loading" style="display:none; text-align:center; font-weight:bold; color:#ff0000; margin-top:20px;">
-      <p>🛠️ Generating Project... Please wait ⏳</p>
-      <div class="spinner"></div>
-    </div>
-  </main>
-
-  <footer>
-    Made with ❤️ by San-0602 |
-    <a href="https://github.com/San-0602" target="_blank">GitHub</a>
-  </footer>
-
-  <script>
-    function toggleTheme() {
-      const body = document.body;
-      body.classList.toggle("ironman-theme");
-      body.classList.toggle("owl-theme");
-    }
- window.onload = () => {
-    const savedTheme = localStorage.getItem("theme");
-    if (savedTheme) {
-      document.body.classList.remove("ironman-theme", "owl-theme");
-      document.body.classList.add(savedTheme);
-    }
-  };
-
-  let width = 0;
-  const bar = document.getElementById('progress-bar');
-  document.querySelectorAll("form").forEach(form => {
-    form.addEventListener("submit", () => {
-      document.getElementById("loading").style.display = "block";
-      width = 0;
-      let interval = setInterval(() => {
-        if (width >= 100) {
-          clearInterval(interval);
-        } else {
-          bar.style.width = `${width++}%`;
-        }
-      }, 20);
+<script>
+  const canvas = document.getElementById('bg');
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  let dots = [];
+  for (let i = 0; i < 45; i++) {
+    dots.push({ x: Math.random() * canvas.width, y: Math.random() * canvas.height, vx: (Math.random() - 0.5) * 0.3, vy: (Math.random() - 0.5) * 0.3, r: 1 + Math.random() });
+  }
+  function draw() {
+    ctx.fillStyle = 'rgba(13, 13, 13, 0.1)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    dots.forEach(dot => {
+      dot.x += dot.vx;
+      dot.y += dot.vy;
+      if (dot.x < 0 || dot.x > canvas.width) dot.vx *= -1;
+      if (dot.y < 0 || dot.y > canvas.height) dot.vy *= -1;
+      ctx.beginPath();
+      ctx.arc(dot.x, dot.y, dot.r, 0, Math.PI * 2);
+      ctx.fillStyle = "#00ffee";
+      ctx.fill();
     });
+    requestAnimationFrame(draw);
+  }
+  draw();
+  window.addEventListener('resize', () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
   });
+
+  // AI Buddy and progress
+  const toggleBtn = document.createElement('button');
+  toggleBtn.innerHTML = '🤖';
+  toggleBtn.className = 'ai-buddy-toggle';
+  document.body.appendChild(toggleBtn);
+
+  const chatBox = document.createElement('div');
+  chatBox.className = 'ai-buddy-chat';
+  chatBox.innerHTML = `
+    <div class="ai-buddy-header">CodeCraft Buddy</div>
+    <div class="ai-buddy-body">
+      👋 Hi! I can explain, debug or enhance your project.<br><br>
+      Shoot your queries after generation!
+    </div>`;
+  document.body.appendChild(chatBox);
+
+  toggleBtn.addEventListener('click', () => {
+    chatBox.style.display = chatBox.style.display === 'flex' ? 'none' : 'flex';
+  });
+
+  function startProgress() {
+    const bar = document.getElementById('progress-bar');
+    bar.style.display = 'block';
+    bar.style.width = '0%';
+    let width = 0;
+    const progress = setInterval(() => {
+      if (width >= 100) {
+        clearInterval(progress);
+        bar.style.display = 'none';
+      } else {
+        width += 1.5;
+        bar.style.width = width + '%';
+      }
+    }, 25);
+  }
 </script>
 </body>
 </html>
