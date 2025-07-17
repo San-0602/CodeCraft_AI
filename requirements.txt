@@ -1,5 +1,7 @@
-streamlit
-cohere
 Flask
-gunicorn
+pymongo
+Flask-Bcrypt
+cohere
+python-dotenv
 fpdf
+gunicorn
