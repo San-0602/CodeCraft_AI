@@ -1,34 +1,48 @@
-# CodeCraft AI
+# 🚀 CodeCraft AI
 
-**From Prompt to Project — Instantly**
+CodeCraft AI is an AI-powered **project generator** for students, developers, and learners. It auto-generates:
 
+* ✅ Customizable coding projects
+* ✅ Code explanations
+* ✅ Viva/oral exam questions
+* ✅ PDF reports for documentation
 
-## Overview
-
-CodeCraft AI is an intelligent project generator that transforms your project ideas into ready-to-use source code, project reports, and viva questions — all instantly! Designed with students and developers in mind, it supports multiple project types, programming languages, and difficulty levels.
-
-Built with Streamlit, powered by Cohere AI for project generation, and integrated with Razorpay (payment integration coming soon), CodeCraft AI offers a seamless user experience with clean UI and PDF export functionality.
-
-
-
-## Features
-
-- Select project type (Web App, Android App, Machine Learning, CLI Tool, etc.)
-- Choose difficulty level (Beginner, Intermediate, Advanced)
-- Pick programming language (Python, Java, Kotlin, JavaScript, C++, Other)
-- Enter your project idea or topic
-- Instantly generate detailed project source code and report using Cohere AI
-- Export project as downloadable PDF
-- [Upcoming] Secure payment integration with Razorpay
-- Responsive, clean UI with user-friendly prompts
+> Powered by **Cohere's LLMs** and built with Python, Flask, and MongoDB.
 
 
+## 🛠️ Tech Stack
 
-## Getting Started
+* **Frontend:** HTML, CSS, JS (Jinja templates)
+* **Backend:** Python, Flask
+* **Database:** MongoDB
+* **AI Model:** Cohere API (`command-r-plus`)
+* **PDF Generation:** FPDF
+* **Deployment:** Render
+* **Authentication:** Flask-Session + Bcrypt
 
-⚠️ License & Usage
-This project is licensed under All Rights Reserved.
-
-You are not permitted to use, copy, modify, distribute, or publish any part of this codebase without the author's explicit written permission. For collaboration requests, please contact me.
+---
 
 
+## 📄 Features
+
+* 👥 **User Registration & Login**
+* 🔥 **AI-powered Project Generation**
+* 📁 **Detailed Code Explanation**
+* 🎓 **Viva/Oral Questions**
+* 📅 **Downloadable PDF Reports**
+* 🎮 **Gamified Login Screen with Random Code Samples**
+* 👩‍💻 **Admin Panel to View Prompt History**
+
+---
+
+## 📝 License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+---
+
+## 📬 Contact
+
+Developed by [S. Sandhya (San-0602)](https://github.com/your-username)
+
+---
